@@ -1,26 +1,48 @@
+import java.util
 import java.util.Properties
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.common.serialization.Serializer
 
-class FlightsInformationProducer {
+object FlightsInformationProducer {
 
-  val alphabet = 'a' to 'z'
-  val events = 10000
-  val topic = "avg"
+  val topic = "cities"
   val brokers = "localhost:9092"
 
   val props = new Properties()
   props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers)
   props.put(ProducerConfig.CLIENT_ID_CONFIG, "FlightsInformationProducer")
   props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
-  props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
-  val producer = new KafkaProducer[String, String](props)
+  props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "FlightSerializer")
+  val producer = new KafkaProducer[String, Flight](props)
 
-  while (true) {
-    val data = new ProducerRecord[String, String](topic, "key", "value")
+  def addFlightInformationToKafka(source: String, flight: Flight): Unit = {
+    //Keys are used to determine the partition within a log to which a message get's appended to
+    val data = new ProducerRecord[String, Flight](topic, source, flight)
     producer.send(data)
+    producer.close()
     print(data + "\n")
   }
+}
 
-  producer.close()
+class FlightSerializer extends Serializer[Flight] {
+
+  val objectMapper = new ObjectMapper()
+
+  def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {
+
+  }
+
+
+  def close(): Unit = {
+  }
+
+  override def serialize(topic: String, data: Flight): Array[Byte] = {
+    try {
+      objectMapper.writeValueAsBytes(data)
+    } catch {
+      case e: Exception => e.printStackTrace(); null
+    }
+  }
 }

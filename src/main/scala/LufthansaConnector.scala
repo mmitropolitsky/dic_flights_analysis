@@ -1,9 +1,8 @@
 import java.time.LocalDateTime
 
 import net.liftweb.json._
-import org.codehaus.jackson.map.ObjectMapper
 
-object LufthansaConnector extends App {
+object LufthansaConnector {
 
   class LocalDateTimeSerializer extends Serializer[LocalDateTime] {
     private val LocalDateTimeClass = classOf[LocalDateTime]
@@ -26,54 +25,43 @@ object LufthansaConnector extends App {
 
   case class AccessToken(access_token: String, token_type: String, expires_in: Long)
 
-  case class DepartureArrival(AirportCode: String, var ScheduledTimeLocal: ScheduledTime, var ScheduledTimeUTC: ScheduledTime,
-                              var ActualTimeLocal: ScheduledTime, var ActualTimeUTC: ScheduledTime, TimeStatus: Status)
+  def getLufthansaAccessToken(): String = {
+    val tokenResp = requests.post(
+      "https://api.lufthansa.com/v1/oauth/token",
+      headers = Map(
+        "Content-Type" -> "application/x-www-form-urlencoded"
+      ),
+      data = Map(
+        "client_id" -> sys.env("LUFTHANSA_CLIENT_ID"),
+        "client_secret" -> sys.env("LUFTHANSA_CLIENT_SECRET"),
+        "grant_type" -> "client_credentials"
+      )
+    )
 
-  class ScheduledTime(var DateTime: LocalDateTime) {
-    println(DateTime)
+    parse(tokenResp.text).extract[AccessToken].access_token
   }
 
-  case class Status(Code: String, Definition: String)
 
-  case class CarrierInfo(AirlineID: String, FlightNumber: Long)
-
-  case class Flight(Departure: DepartureArrival, Arrival: DepartureArrival, OperatingCarrier: CarrierInfo)
-
-  case class Flights(Flight: Array[DepartureArrival])
-
-  case class FlightStatusResource(Flights: Flights)
-
-  val tokenResp = requests.post(
-    "https://api.lufthansa.com/v1/oauth/token",
-    headers = Map(
-      "Content-Type" -> "application/x-www-form-urlencoded"
-    ),
-    data = Map(
-      "client_id" -> sys.env("LUFTHANSA_CLIENT_ID"),
-      "client_secret" -> sys.env("LUFTHANSA_CLIENT_SECRET"),
-      "grant_type" -> "client_credentials"
+  def getStatusForFlightsWithSourceAndDestination(accessToken: String , source: String, destination: String): Array[Flight] = {
+    val flightStatus = requests.get(
+      s"https://api.lufthansa.com/v1/operations/flightstatus/route/$source/$destination/2019-10-18",
+      headers = Map(
+        "Authorization" -> s"Bearer $accessToken",
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
     )
-  )
+    convertJsonToFlightStatusResource(flightStatus.text)
+  }
 
-  val accessToken = parse(tokenResp.text).extract[AccessToken].access_token
-
-  val flightStatus = requests.get(
-    "https://api.lufthansa.com/v1/operations/flightstatus/route/SOF/FRA/2019-10-18",
-    headers = Map(
-      "Authorization" -> s"Bearer $accessToken",
-      "Content-Type" -> "application/json",
-      "Accept" -> "application/json"
-    )
-  )
-
-  convertJsonToFlightStatusResource(flightStatus.text)
-
-  def convertJsonToFlightStatusResource(flightsJson: String): String = {
-
+  def convertJsonToFlightStatusResource(flightsJson: String): Array[Flight] = {
     val flights = parse(flightsJson)
     val flightJsonObject = flights.asInstanceOf[JObject].obj.head.value.asInstanceOf[JObject].obj.head
     val flightJsonObjectArray = flightJsonObject.value.asInstanceOf[JObject].obj.head.value.asInstanceOf[_root_.net.liftweb.json.JsonAST.JArray].arr
-    var dep = flightJsonObjectArray.head.asInstanceOf[JObject].obj.head.value.extract[DepartureArrival]
-    ""
+    val arr = flightJsonObjectArray.map(_.asInstanceOf[JObject].obj)
+    val arraysOfDeparturesJsonObjectArray = arr.map(_.head.value.extract[DepartureArrival])
+    val arraysOfArrivalsJsonObjectArray = arr.map(_(1).value.extract[DepartureArrival])
+    val arraysOfOperatingCarrierJsonObjectArray = arr.map(_(3).value.extract[CarrierInfo])
+    Array.fill[Flight](1)(new Flight(arraysOfDeparturesJsonObjectArray.head, arraysOfArrivalsJsonObjectArray.head, arraysOfOperatingCarrierJsonObjectArray.head))
   }
 }
