@@ -45,7 +45,7 @@ object LufthansaConnector {
   }
 
 
-  def getStatusForFlightsWithSourceAndDestination(accessToken: String, source: String, destination: String): Array[Flight] = {
+  def getStatusForFlightsWithSourceAndDestination(accessToken: String, source: String, destination: String): List[Flight] = {
     val flightStatus = requests.get(
       s"https://api.lufthansa.com/v1/operations/flightstatus/route/$source/$destination/2019-10-18",
       headers = Map(
@@ -57,14 +57,14 @@ object LufthansaConnector {
     convertJsonToFlightStatusResource(flightStatus.text)
   }
 
-  def convertJsonToFlightStatusResource(flightsJson: String): Array[Flight] = {
+  def convertJsonToFlightStatusResource(flightsJson: String): List[Flight] = {
     val flights = parse(flightsJson)
     val flightJsonObject = flights.asInstanceOf[JObject].obj.head.value.asInstanceOf[JObject].obj.head
     val flightJsonObjectArray = flightJsonObject.value.asInstanceOf[JObject].obj.head.value.asInstanceOf[_root_.net.liftweb.json.JsonAST.JArray].arr
     val arr = flightJsonObjectArray.map(_.asInstanceOf[JObject].obj)
-    val arraysOfDeparturesJsonObjectArray = arr.map(_.head.value.extract[DepartureArrival])
-    val arraysOfArrivalsJsonObjectArray = arr.map(_ (1).value.extract[DepartureArrival])
-    val arraysOfOperatingCarrierJsonObjectArray = arr.map(_ (3).value.extract[CarrierInfo])
-    Array.fill[Flight](1)(Flight(arraysOfDeparturesJsonObjectArray.head, arraysOfArrivalsJsonObjectArray.head, arraysOfOperatingCarrierJsonObjectArray.head))
+
+    arr.map { i =>
+      Flight(i.head.value.extract[DepartureArrival], i(1).value.extract[DepartureArrival], i(3).value.extract[CarrierInfo])
+    }
   }
 }
