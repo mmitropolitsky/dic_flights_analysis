@@ -21,7 +21,7 @@ object FlightsInformationProducer {
     //Keys are used to determine the partition within a log to which a message get's appended to
     val data = new ProducerRecord[String, Flight](topic, source, flight)
     producer.send(data)
-    producer.close()
+//    producer.close()
     print(data + "\n")
   }
 }

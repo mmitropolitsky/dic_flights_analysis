@@ -47,7 +47,7 @@ object LufthansaConnector {
     val arr = flightJsonObjectArray.map(_.asInstanceOf[JObject].obj)
 
     arr.map { i =>
-      Flight(i.head.value.extract[DepartureArrival], i(1).value.extract[DepartureArrival], i(3).value.extract[CarrierInfo])
+      new Flight(i.head.value.extract[DepartureArrival], i(1).value.extract[DepartureArrival], i(3).value.extract[CarrierInfo])
     }
   }
 }

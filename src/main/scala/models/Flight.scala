@@ -1,15 +1,17 @@
 package models
 
+import java.io.Serializable
 import java.time.LocalDateTime
 
 
-case class Flight(Departure: DepartureArrival, Arrival: DepartureArrival, OperatingCarrier: CarrierInfo)
+class Flight(val Departure: DepartureArrival, val Arrival: DepartureArrival, val OperatingCarrier: CarrierInfo) extends Serializable {
+}
 
-case class DepartureArrival(AirportCode: String, var ScheduledTimeLocal: ScheduledTime, var ScheduledTimeUTC: ScheduledTime,
-                            var ActualTimeLocal: ScheduledTime, var ActualTimeUTC: ScheduledTime, TimeStatus: Status)
+class DepartureArrival(val AirportCode: String, var ScheduledTimeLocal: ScheduledTime, var ScheduledTimeUTC: ScheduledTime,
+                            var ActualTimeLocal: ScheduledTime, var ActualTimeUTC: ScheduledTime, val TimeStatus: Status) extends Serializable
 
-class ScheduledTime(var DateTime: LocalDateTime)
+class ScheduledTime(var DateTime: LocalDateTime) extends Serializable
 
-case class Status(Code: String, Definition: String)
+class Status(val Code: String, val Definition: String) extends Serializable
 
-case class CarrierInfo(AirlineID: String, FlightNumber: Long)
+class CarrierInfo(val AirlineID: String, val FlightNumber: Long) extends Serializable
