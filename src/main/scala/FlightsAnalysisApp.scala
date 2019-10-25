@@ -1,3 +1,6 @@
+import connectors.LufthansaConnector
+import producers.FlightsInformationProducer
+
 object FlightsAnalysisApp extends App {
 
   val source = "SOF"

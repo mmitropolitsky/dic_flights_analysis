@@ -1,0 +1,7 @@
+package connectors
+
+class DarkSkyWeatherConnector {
+
+
+
+}
