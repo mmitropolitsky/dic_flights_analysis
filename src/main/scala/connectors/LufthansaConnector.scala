@@ -1,30 +1,13 @@
 package connectors
 
-import java.time.LocalDateTime
-
 import models.{CarrierInfo, DepartureArrival, Flight}
 import net.liftweb.json._
+import serializers.LocalDateTimeFromStringSerializer
 
 object LufthansaConnector {
 
-  class LocalDateTimeSerializer extends Serializer[LocalDateTime] {
-    private val LocalDateTimeClass = classOf[LocalDateTime]
 
-    def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), LocalDateTime] = {
-      case (TypeInfo(LocalDateTimeClass, _), json) => json match {
-
-        case JString(dTF) => if (dTF.takeRight(1) == "Z") LocalDateTime.parse(dTF.dropRight(1))
-        else LocalDateTime.parse(dTF);
-        case x => throw new MappingException("Can't convert " + x + " to LocalDateTime")
-      }
-    }
-
-    def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-      case x: LocalDateTime => JString(x.toString)
-    }
-  }
-
-  implicit val formats = DefaultFormats + new LocalDateTimeSerializer
+  implicit val formats = DefaultFormats + new LocalDateTimeFromStringSerializer
 
   case class AccessToken(access_token: String, token_type: String, expires_in: Long)
 

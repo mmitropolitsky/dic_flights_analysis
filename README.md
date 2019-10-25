@@ -8,3 +8,4 @@ KAFKA_HOME env variable, you can use the start_script.sh to start Kafka and crea
 - LUFTHANSA_CLIENT_ID
 - LUFTHANSA_CLIENT_SECRET
 - KAFKA_BROKER - the address of Kafka
+- DARK_SKY_WEATHER_API_SECRET
