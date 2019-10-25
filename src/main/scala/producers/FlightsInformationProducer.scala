@@ -11,7 +11,7 @@ import org.apache.kafka.common.serialization.Serializer
 object FlightsInformationProducer {
 
   val topic = "cities"
-  val brokers = "localhost:9092"
+  val brokers = sys.env("KAFKA_BROKER")
 
   val props = new Properties()
   props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers)
