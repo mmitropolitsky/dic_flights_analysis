@@ -22,8 +22,8 @@ object FlightsAnalysisApp extends App {
 //        val flights = LufthansaConnector.getFlightsBySourceDestinationDate(accessToken, source, destination, date)
 
 
-    var localTime1 = new ScheduledTime(LocalDateTime.parse("2019-10-13T10:00"))
-    var localTime1late = new ScheduledTime(LocalDateTime.parse("2019-10-13T15:00"))
+    var localTime1 = new ScheduledTime(LocalDateTime.parse("2019-10-27T10:00"))
+    var localTime1late = new ScheduledTime(LocalDateTime.parse("2019-10-27T15:00"))
     var status = new Status("TEST", "Testing ")
     var dep = new DepartureArrival("FRA", localTime1, localTime1, localTime1, localTime1, status)
     var dep2 = new DepartureArrival("MUN", localTime1, localTime1, localTime1, localTime1, status)
@@ -37,17 +37,17 @@ object FlightsAnalysisApp extends App {
     requests += 1
     Thread.sleep(1000)
   }
-  val darkSkyWeatherConnector = DarkSkyWeatherConnector
+//  val darkSkyWeatherConnector = DarkSkyWeatherConnector
 
   //  Airport.airportCodeToCoordinatesMap.foreach {
   //    airport =>
-  val w = darkSkyWeatherConnector.getWeatherForecastForAirport("SOF")
+//  val w = darkSkyWeatherConnector.getWeatherForecastForAirport("SOF")
   //      Thread.sleep(1000)
   //  }
 
-  val cassandra = new WeatherCassandraRepository
+//  val cassandra = new WeatherCassandraRepository
   //  cassandra.selectAll()
-  val flatDailyWeatherList = WeatherToFlatDailyWeatherConverter.convert(w)
-  cassandra.batchSaveFlatWeatherList(flatDailyWeatherList)
+//  val flatDailyWeatherList = WeatherToFlatDailyWeatherConverter.convert(w)
+//  cassandra.batchSaveFlatWeatherList(flatDailyWeatherList)
 
 }
