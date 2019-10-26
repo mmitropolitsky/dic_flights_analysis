@@ -3,10 +3,10 @@ package serializers
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 import java.util
 
-import models.Flight
+import models.FlatFlight
 import org.apache.kafka.common.serialization.Serializer
 
-class FlightSerializer extends Serializer[Flight] {
+class FlightSerializer extends Serializer[FlatFlight] {
 
   def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {
 
@@ -16,7 +16,7 @@ class FlightSerializer extends Serializer[Flight] {
   def close(): Unit = {
   }
 
-  override def serialize(topic: String, data: Flight): Array[Byte] = {
+  override def serialize(topic: String, data: FlatFlight): Array[Byte] = {
     try {
       val byteOut = new ByteArrayOutputStream()
       val objOut = new ObjectOutputStream(byteOut)

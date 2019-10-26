@@ -2,7 +2,7 @@ package consumers
 
 import consumers.deserializer.FlightDeserializer
 import kafka.serializer.StringDecoder
-import models.Flight
+import models.{FlatFlight, Flight}
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.{SparkConf, SparkContext}
@@ -24,7 +24,7 @@ object FlightsInformationConsumer extends App {
     "zookeeper.connection.timeout.ms" -> "1000")
   val topic = Set("cities")
   val flights = KafkaUtils.createDirectStream[
-    String, Flight,
+    String, FlatFlight,
     StringDecoder,
     FlightDeserializer](
     ssc, kafkaConf, topic)

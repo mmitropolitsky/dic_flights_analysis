@@ -4,6 +4,8 @@ import models.{CarrierInfo, DepartureArrival, Flight}
 import net.liftweb.json._
 import serializers.LocalDateTimeFromStringSerializer
 
+import java.time.LocalDate
+
 object LufthansaConnector {
 
 
@@ -28,9 +30,9 @@ object LufthansaConnector {
   }
 
 
-  def getStatusForFlightsWithSourceAndDestination(accessToken: String, source: String, destination: String): List[Flight] = {
+  def getFlightsBySourceDestinationDate(accessToken: String, source: String, destination: String, date: LocalDate): List[Flight] = {
     val flightStatus = requests.get(
-      s"https://api.lufthansa.com/v1/operations/flightstatus/route/$source/$destination/2019-10-18",
+      s"https://api.lufthansa.com/v1/operations/flightstatus/route/$source/$destination/$date",
       headers = Map(
         "Authorization" -> s"Bearer $accessToken",
         "Content-Type" -> "application/json",
