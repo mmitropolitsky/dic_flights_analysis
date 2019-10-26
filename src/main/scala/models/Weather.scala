@@ -2,7 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
-case class Weather(longitude: Double, latitude: Double, timezone: String, daily: DailyListData, alerts: List[Alert])
+case class Weather(var airportCode: Option[String], longitude: Double, latitude: Double, timezone: String, daily: DailyListData, alerts: List[Alert])
 
 case class DailyListData(summary: String, icon: String, data: List[SingleDayData])
 
@@ -14,7 +14,7 @@ class Alert(val title: String,
             val severity: Option[String],
             val uri: String)
 
-class SingleDayData(val time: Int,
+class SingleDayData(val time: LocalDateTime,
                     val summary: String,
                     val icon: String,
                     val sunriseTime: LocalDateTime,

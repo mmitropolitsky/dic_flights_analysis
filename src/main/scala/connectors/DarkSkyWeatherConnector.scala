@@ -10,18 +10,21 @@ object DarkSkyWeatherConnector {
 
   private val secret = sys.env("DARK_SKY_WEATHER_API_SECRET")
 
-  def getWeatherForecastForAirport(airportCode: String = "ARN"): String = {
+  private var apiCalls: Int = 0;
 
-    // Frankfurt: 50.1213475,8.4961381
-    // Stockholm: 59.3262416,17.8416281
-    val airportCoordinates = Airport.airportCodeToCoordinatesMap.get(airportCode)
-    val weather = requests.get(
-      s"https://api.darksky.net/forecast/$secret/$airportCoordinates?units=si&exclude=minutely,currently,hourly",
-      headers = Map()
-    )
+  def getWeatherForecastForAirport(airportCode: String = "ARN"): Weather = {
 
-    val testString =
-      """{
+    if (apiCalls < 900) {
+      val airportCoordinates = Airport.airportCodeToCoordinatesMap.get(airportCode)
+      val weatherResponse = requests.get(
+        s"https://api.darksky.net/forecast/$secret/${airportCoordinates.get}?units=si&exclude=minutely,currently,hourly",
+        headers = Map()
+      )
+
+      apiCalls = weatherResponse.headers("x-forecast-api-calls").head.toInt
+
+      val testString =
+        """{
                 "latitude": 59.3262416,
                 "longitude": 17.8416281,
                 "timezone": "Europe/Stockholm",
@@ -384,9 +387,14 @@ object DarkSkyWeatherConnector {
                 "offset": 2
               }"""
 
-    val test = parse(testString).extract[Weather]
-    print(test)
+      val weather = parse(testString).extract[Weather]
+      weather.airportCode = Option(airportCode)
+//      print(test)
 
-    test.toString
+      weather
+    } else {
+      throw new Exception("Daily limit reached for Dark Sky API.")
+    }
+
   }
 }

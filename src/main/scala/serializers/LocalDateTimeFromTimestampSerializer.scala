@@ -2,6 +2,7 @@ package serializers
 
 import java.time.{Instant, LocalDateTime, ZoneId}
 
+import convertors.ConverterUtils
 import net.liftweb.json._
 
 class LocalDateTimeFromTimestampSerializer extends Serializer[LocalDateTime] {
@@ -16,6 +17,6 @@ class LocalDateTimeFromTimestampSerializer extends Serializer[LocalDateTime] {
   }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-    case x: LocalDateTime => JString(x.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli().toString())
+    case x: LocalDateTime => JInt(ConverterUtils.convertLocalDateTimeToTimestamp(x))
   }
 }

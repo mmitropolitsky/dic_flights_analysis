@@ -1,9 +1,12 @@
+
+
 import java.time.LocalDateTime
 
-import connectors.{DarkSkyWeatherConnector, LufthansaConnector}
-import connectors.LufthansaConnector
-import models.{CarrierInfo, DepartureArrival, Flight, ScheduledTime, Status}
+import connectors.DarkSkyWeatherConnector
+import convertors.WeatherToFlatDailyWeatherConverter
+import models._
 import producers.FlightsInformationProducer
+import repositories.cassandra._
 
 object FlightsAnalysisApp extends App {
 
@@ -11,8 +14,8 @@ object FlightsAnalysisApp extends App {
   val destination = "FRA"
   var requests = 0
   while (requests < 500) {
-//    val accessToken = LufthansaConnector.getLufthansaAccessToken()
-//    val flights = LufthansaConnector.getStatusForFlightsWithSourceAndDestination(accessToken, source, destination)
+    //    val accessToken = LufthansaConnector.getLufthansaAccessToken()
+    //    val flights = LufthansaConnector.getStatusForFlightsWithSourceAndDestination(accessToken, source, destination)
 
 
     var localTime1 = new ScheduledTime(LocalDateTime.parse("2019-10-13T10:00"))
@@ -24,10 +27,18 @@ object FlightsAnalysisApp extends App {
     FlightsInformationProducer.addFlightInformationToKafka(destination, flight)
     requests += 1
     Thread.sleep(1000)
-
-//    val darkSkyWeatherConnector = DarkSkyWeatherConnector
-//    darkSkyWeatherConnector.getWeatherForecastForAirport("SOF")
-
   }
+  val darkSkyWeatherConnector = DarkSkyWeatherConnector
+
+  //  Airport.airportCodeToCoordinatesMap.foreach {
+  //    airport =>
+  val w = darkSkyWeatherConnector.getWeatherForecastForAirport("SOF")
+  //      Thread.sleep(1000)
+  //  }
+
+  val cassandra = new WeatherCassandraRepository
+  //  cassandra.selectAll()
+  val flatDailyWeatherList = WeatherToFlatDailyWeatherConverter.convert(w)
+  cassandra.batchSaveFlatWeatherList(flatDailyWeatherList)
 
 }

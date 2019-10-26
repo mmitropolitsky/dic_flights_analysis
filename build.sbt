@@ -10,9 +10,8 @@ libraryDependencies ++= Seq(
   "org.apache.spark" % "spark-streaming_2.11" % "2.2.1",
   "org.apache.spark" % "spark-streaming-kafka-0-8_2.11" % "2.2.1",
   ("com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2").exclude("io.netty", "netty-handler"),
-//  "com.lihaoyi" %% "ujson" % "0.7.1",
+  "com.datastax.dse" % "dse-java-driver-query-builder" % "2.2.0",
   "com.lihaoyi" %% "requests" % "0.1.8",
-//  "com.typesafe.play" % "play-json_2.11" % "2.7.3",
   "net.liftweb" %% "lift-json" % "3.3.0"
 
 )
