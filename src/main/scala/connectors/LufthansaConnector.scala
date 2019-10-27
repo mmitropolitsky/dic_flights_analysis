@@ -28,9 +28,9 @@ object LufthansaConnector {
   }
 
 
-  def getStatusForFlightsWithSourceAndDestination(accessToken: String, source: String, destination: String): List[Flight] = {
+  def getStatusForFlightsWithSourceAndDestination(accessToken: String, source: String, destination: String, date: String): List[Flight] = {
     val flightStatus = requests.get(
-      s"https://api.lufthansa.com/v1/operations/flightstatus/route/$source/$destination/2019-10-18",
+      s"https://api.lufthansa.com/v1/operations/flightstatus/route/$source/$destination/$date",
       headers = Map(
         "Authorization" -> s"Bearer $accessToken",
         "Content-Type" -> "application/json",
@@ -43,11 +43,17 @@ object LufthansaConnector {
   def convertJsonToFlightStatusResource(flightsJson: String): List[Flight] = {
     val flights = parse(flightsJson)
     val flightJsonObject = flights.asInstanceOf[JObject].obj.head.value.asInstanceOf[JObject].obj.head
-    val flightJsonObjectArray = flightJsonObject.value.asInstanceOf[JObject].obj.head.value.asInstanceOf[_root_.net.liftweb.json.JsonAST.JArray].arr
-    val arr = flightJsonObjectArray.map(_.asInstanceOf[JObject].obj)
+    try {
+      val flightJsonObjectArray = flightJsonObject.value.asInstanceOf[JObject].obj.head.value.asInstanceOf[_root_.net.liftweb.json.JsonAST.JArray].arr
+      val arr = flightJsonObjectArray.map(_.asInstanceOf[JObject].obj)
 
-    arr.map { i =>
-      new Flight(i.head.value.extract[DepartureArrival], i(1).value.extract[DepartureArrival], i(3).value.extract[CarrierInfo])
+      arr.map { i =>
+        new Flight(i.head.value.extract[DepartureArrival], i(1).value.extract[DepartureArrival], i(3).value.extract[CarrierInfo])
+      }
+    } catch {
+      case e: MappingException => List[Flight]()
+
     }
+
   }
 }

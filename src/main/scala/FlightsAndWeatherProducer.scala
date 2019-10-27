@@ -1,29 +1,25 @@
-import producers.FlightsInformationProducer
-
-import java.time.LocalDateTime
-
+import connectors.LufthansaConnector
 import models._
+import producers.FlightsInformationProducer
 
 object FlightsAndWeatherProducer extends App {
 
-  val source = "SOF"
-  val destination = "FRA"
+  val source = "FRA"
+  val dates = List("2019-10-23", "2019-10-24", "2019-10-25", "2019-10-26", "2019-10-27")
   var requests = 0
   while (requests < 500) {
-    //    val accessToken = LufthansaConnector.getLufthansaAccessToken()
-    //    val flights = LufthansaConnector.getStatusForFlightsWithSourceAndDestination(accessToken, source, destination)
+
+    Airport.airportCodeToCoordinatesMap.foreach(a => {
+      val accessToken = LufthansaConnector.getLufthansaAccessToken()
+      dates.foreach(d => {
+        val flights = LufthansaConnector.getStatusForFlightsWithSourceAndDestination(accessToken, source, a._1, d)
+        flights.foreach(f => FlightsInformationProducer.addFlightInformationToKafka(a._1, f))
+        requests += 1
+        Thread.sleep(2000)
+      })
+    })
 
 
-    var localTime1 = new ScheduledTime(LocalDateTime.parse("2019-10-27T10:00"))
-    var localArrival = new ScheduledTime(LocalDateTime.parse("2019-10-27T10:40"))
-    var status = new Status("TEST", "Testing ")
-    var dep = new DepartureArrival("FRA", localTime1, localTime1, localArrival, localArrival, status)
-    var arr = new DepartureArrival("SOF", localTime1, localTime1, localArrival, localArrival, status)
-    var carrierInfo = new CarrierInfo("LH", 1234)
-    var flight = new Flight(dep, arr, carrierInfo)
-    FlightsInformationProducer.addFlightInformationToKafka(destination, flight)
-    requests += 1
-    Thread.sleep(1000)
   }
   //  val darkSkyWeatherConnector = DarkSkyWeatherConnector
 
