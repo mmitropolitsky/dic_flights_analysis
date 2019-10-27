@@ -1,5 +1,7 @@
 package connectors
 
+import java.time.{LocalDateTime, ZoneId, ZoneOffset}
+
 import models.{Airport, Weather}
 import net.liftweb.json._
 import serializers.LocalDateTimeFromTimestampSerializer
@@ -10,7 +12,35 @@ object DarkSkyWeatherConnector {
 
   private val secret = sys.env("DARK_SKY_WEATHER_API_SECRET")
 
-  private var apiCalls: Int = 0;
+  private var apiCalls: Int = 0
+
+  def getPastWeatherForAirport(airportCode: String = "ARN", daysBefore: Int = 1): List[Weather] = {
+    var weatherList = List[Weather]()
+    if (apiCalls < 900) {
+      val airportCoordinates = Airport.airportCodeToCoordinatesMap.get(airportCode)
+      for (i <- 1 to daysBefore) {
+        val unixTimestamp = LocalDateTime.now().minusDays(i).atZone(ZoneId.systemDefault()).toEpochSecond
+
+        val airportCoordinates = Airport.airportCodeToCoordinatesMap.get(airportCode)
+        val weatherResponse = requests.get(
+          s"https://api.darksky.net/forecast/$secret/${airportCoordinates.get},$unixTimestamp?units=si&exclude=minutely,currently,hourly",
+          headers = Map()
+        )
+
+        apiCalls = weatherResponse.headers("x-forecast-api-calls").head.toInt
+
+        val weather = parse(weatherResponse.text).extract[Weather]
+        weather.airportCode = Option(airportCode)
+
+        weatherList = weather :: weatherList
+        Thread.sleep(1000)
+      }
+    } else {
+      throw new Exception("Daily limit reached for Dark Sky API.")
+    }
+
+    weatherList
+  }
 
   def getWeatherForecastForAirport(airportCode: String = "ARN"): Weather = {
 
@@ -387,9 +417,8 @@ object DarkSkyWeatherConnector {
                 "offset": 2
               }"""
 
-      val weather = parse(testString).extract[Weather]
+      val weather = parse(weatherResponse.text).extract[Weather]
       weather.airportCode = Option(airportCode)
-//      print(test)
 
       weather
     } else {

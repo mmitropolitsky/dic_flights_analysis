@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 case class Weather(var airportCode: Option[String], longitude: Double, latitude: Double, timezone: String, daily: DailyListData, alerts: List[Alert])
 
-case class DailyListData(summary: String, icon: String, data: List[SingleDayData])
+case class DailyListData(summary: Option[String], icon: Option[String], data: List[SingleDayData])
 
 class Alert(val title: String,
             val time: LocalDateTime,

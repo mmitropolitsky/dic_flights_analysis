@@ -10,7 +10,7 @@ class WeatherCassandraRepository {
 
   val cluster = Cluster.builder().withoutJMXReporting()
     .addContactPoint("127.0.0.1").build()
-  val session = cluster.connect()
+  var session = cluster.connect()
 
   session.execute("CREATE KEYSPACE IF NOT EXISTS weather WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };")
 
@@ -46,7 +46,7 @@ class WeatherCassandraRepository {
       visibility float);""".stripMargin)
 
   def batchSaveFlatWeatherList(flatDailyWeatherList: List[FlatDailyWeather]): Unit = {
-    if (session.isClosed) cluster.connect()
+    if (session.isClosed) session= cluster.connect()
 
     var insertList: List[Insert] = List[Insert]()
 

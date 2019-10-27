@@ -29,7 +29,7 @@ object FlightsInformationConsumer extends App {
     "metadata.broker.list" -> sys.env("KAFKA_BROKER"),
     "zookeeper.connect" -> sys.env("ZOOKEEPER_ADDRESS"),
     "group.id" -> "kafka-spark-streaming",
-    "zookeeper.connection.timeout.ms" -> "1000")
+    "zookeeper.connection.timeout.ms" -> "100000")
   val topic = Set("cities")
 
   val dangerousWeatherStates = List("rain", "fog", "wind", "snow", "sleet", "hail")
@@ -43,6 +43,7 @@ object FlightsInformationConsumer extends App {
 
   // Update total count into state and in Cassandra
   FlightCalculator.calculateTotalFlights(flights)
+  flights.count().print()
 
   // Filter late flights
   val lateFlights = flights.filter(flight => {

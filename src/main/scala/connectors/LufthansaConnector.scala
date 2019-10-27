@@ -24,7 +24,7 @@ object LufthansaConnector {
       )
     )
 
-    parse(tokenResp.text).extract[AccessToken].access_token
+    parse(tokenResp.text).extract[AccessToken].access_token.toString
   }
 
 

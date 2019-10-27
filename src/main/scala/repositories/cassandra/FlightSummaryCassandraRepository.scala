@@ -7,9 +7,9 @@ import models.FlightSummary
 
 class FlightSummaryCassandraRepository {
 
-  val cluster = Cluster.builder().withoutJMXReporting()
+  private val cluster = Cluster.builder().withoutJMXReporting()
     .addContactPoint("127.0.0.1").build()
-  val session = cluster.connect()
+  private val session = cluster.connect()
 
   session.execute("CREATE KEYSPACE IF NOT EXISTS weather WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };")
 
