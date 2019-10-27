@@ -9,7 +9,7 @@ class FlightSummaryCassandraRepository {
 
   private val cluster = Cluster.builder().withoutJMXReporting()
     .addContactPoint("127.0.0.1").build()
-  private val session = cluster.connect()
+  private var session = cluster.connect()
 
   session.execute("CREATE KEYSPACE IF NOT EXISTS weather WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };")
 
@@ -25,7 +25,7 @@ class FlightSummaryCassandraRepository {
 
 
   def selectAll(): List[FlightSummary] = {
-    if (session.isClosed) cluster.connect()
+    if (session.isClosed) session = cluster.connect()
     val select = QueryBuilder.select(
       "\"airportCode\"",
       "date",

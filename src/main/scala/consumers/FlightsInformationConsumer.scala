@@ -68,9 +68,6 @@ object FlightsInformationConsumer extends App {
   // Count delayed flights based on weather function
   FlightCalculator.calculateLateFlightsDueToWeather(flightsDelayedDueToWeather)
 
-  VisualizeFlightsInformation.visualizeRatioBetweenAllFlightsAndLateFlights()
-
-  // TODO filtered by weather values should be updated in the state
   ssc.start()
   ssc.awaitTermination()
 
