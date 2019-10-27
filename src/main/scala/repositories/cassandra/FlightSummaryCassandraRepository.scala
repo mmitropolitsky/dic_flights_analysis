@@ -35,6 +35,8 @@ class FlightSummaryCassandraRepository {
 
     val resultSet = session.execute(select)
 
+    session.close()
+
     var list = List[FlightSummary]()
     val it = resultSet.iterator()
     while (it.hasNext) {
