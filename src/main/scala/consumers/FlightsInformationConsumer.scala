@@ -41,6 +41,8 @@ object FlightsInformationConsumer extends App {
     FlightDeserializer](
     ssc, kafkaConf, topic)
 
+  flights.count().print()
+  flights.print()
   // Update total count into state and in Cassandra
   FlightCalculator.calculateTotalFlights(flights)
   flights.count().print()

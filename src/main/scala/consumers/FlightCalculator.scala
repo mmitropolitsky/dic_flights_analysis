@@ -37,14 +37,18 @@ object FlightCalculator {
       case (k, None) =>
         val fs = FlightSummary(airportCode = airportCode, date = date, totalFlights = 1, totalLateFlights = 0, totalLateFlightsDueToWeather = 0)
         val map = Map(k -> fs)
-        state.update(map)
+        if (!state.isTimingOut()) {
+          state.update(map)
+        }
         fs
 
       case (k, Some(existingState)) =>
         val existingSummary = existingState.get(k)
         existingSummary.get.totalFlights += 1
         val map = Map(k -> existingSummary.get)
-        state.update(map)
+        if (!state.isTimingOut()) {
+          state.update(map)
+        }
         existingSummary.get
     }
   }
@@ -59,14 +63,18 @@ object FlightCalculator {
       case (k, None) =>
         val fs = FlightSummary(airportCode = airportCode, date = date, totalFlights = 1, totalLateFlights = 1, totalLateFlightsDueToWeather = 0)
         val map = Map(k -> fs)
-        state.update(map)
+        if (!state.isTimingOut()) {
+          state.update(map)
+        }
         fs
 
       case (k, Some(existingState)) =>
         val existingSummary = existingState.get(k)
         existingSummary.get.totalLateFlights += 1
         val map = Map(k -> existingSummary.get)
-        state.update(map)
+        if (!state.isTimingOut()) {
+          state.update(map)
+        }
         existingSummary.get
     }
   }
@@ -81,42 +89,21 @@ object FlightCalculator {
       case (k, None) =>
         val fs = FlightSummary(airportCode = airportCode, date = date, totalFlights = 1, totalLateFlights = 1, totalLateFlightsDueToWeather = 1)
         val map = Map(k -> fs)
-        state.update(map)
+        if (!state.isTimingOut()) {
+          state.update(map)
+        }
         fs
 
       case (k, Some(existingState)) =>
         val existingSummary = existingState.get(k)
         existingSummary.get.totalLateFlightsDueToWeather += 1
         val map = Map(k -> existingSummary.get)
-        state.update(map)
+        if (!state.isTimingOut()) {
+          state.update(map)
+        }
+
         existingSummary.get
     }
   }
-
-//  def mappingFunc(key: String, value: Option[(FlatFlight, FlatDailyWeather)], state: State[Map[String, FlightSummary]]): Unit = {
-  //    (key, state.getOption()) match {
-  //      // no state yet
-  //      case (k, None) => {
-  //        val airportCode = key.split(",")(0)
-  //        val date = key.split(",")(1)
-  //        val fs = FlightSummary(airportCode = airportCode, date = date, totalFlights = 1, totalLateFlights = 0, totalLateFlightsDueToWeather = 0)
-  //        val map = Map(k -> fs)
-  //        // TODO convert to flight summary the map
-  //        state.update(map)
-  //      }
-  //      // there is state
-  //      case (k, Some(existingState)) => {
-  //        if (existingState.contains(value.get._1.airportDateKey)) {
-  //          var existingDestinationAndDateRecord = existingState.get(value.get._1.airportDateKey)
-  //          //          existingDestinationAndDateRecord = value :: existingDestinationAndDateRecord
-  //          //          state.update(updateState)
-  //        } else {
-  //          var updateState = existingState
-  //          //          updateState += value.get._1.airportDateKey -> List(value.get)
-  //          state.update(updateState)
-  //        }
-  //      }
-  //    }
-  //  }
 
 }
