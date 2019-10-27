@@ -1,8 +1,6 @@
 package consumers
 
 import com.datastax.driver.core.Cluster
-import convertors.CassandraRowToFlatWeatherConverter
-import consumers.deserializer.FlightDeserializer
 import kafka.serializer.StringDecoder
 import models.FlatFlight
 import org.apache.spark.streaming._

@@ -1,46 +1,29 @@
 package consumers
 
-import org.apache.spark._
-import org.apache.spark.sql._
-import com.datastax.spark.connector.rdd.ReadConf
-
 import com.datawizards.splot.api.implicits._
-
-import models.FlightSummary
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.cassandra.DataFrameReaderWrapper
+import repositories.cassandra.FlightSummaryCassandraRepository
+import vegas._
+import vegas.render.WindowRenderer._
 
 object VisualizeFlightsInformation {
 
-  implicit val myObjEncoder = org.apache.spark.sql.Encoders.product[FlightSummary]
-
   def visualizeRatioBetweenAllFlightsAndLateFlights(): Unit = {
 
-    val spark = SparkSession
-      .builder()
-       .master("local")
-      .appName("FlightsInformationConsumer")
-      .config("spark.cassandra.connection.host", "localhost")
-      .getOrCreate()
+    val flightSummaryRepo = new FlightSummaryCassandraRepository
+    val flightSummaries = flightSummaryRepo.selectAll()
 
-    val flightsSummaryDF = spark
-      .read
-      .cassandraFormat("flight_summary", "weather")
-//      .options(ReadConf.SplitSizeInMBParam.option(32))
-      .load()
+    flightSummaries.foreach { i => {
 
+      Seq(("lateFlights", (i.totalLateFlights.toInt)),
+        ("lateFlightsDueToWeather", i.totalLateFlightsDueToWeather.toInt),
+        ("flightsOnTime", (i.totalFlights - i.totalLateFlights)))
+        .buildPlot().pie()
+        .title("Airport code: " + i.airportCode + "; date: " + i.date).display()
+      }
+    }
 
-    val flightSummary = flightsSummaryDF.as(myObjEncoder)
-    flightSummary.as
+    val flightsByAirport = flightSummaries.groupBy(_.airportCode)
 
-    Seq(
-      ("lateFlights", flightSummary.),
-      ("flightsOnTime", 72),
-      ("FR", 63),
-      ("UK", 62),
-        ("IT", 61)
-      )
-      .plotPie()
   }
 
 }

@@ -27,11 +27,11 @@ class FlightSummaryCassandraRepository {
   def selectAll(): List[FlightSummary] = {
     if (session.isClosed) cluster.connect()
     val select = QueryBuilder.select(
-      "airportCode",
+      "\"airportCode\"",
       "date",
-      "totalFlights",
-      "totalLateFlights",
-      "totalLateFlightsDueToWeather").from("weather", "flight_summary")
+      "\"totalFlights\"",
+      "\"totalLateFlights\"",
+      "\"totalLateFlightsDueToWeather\"").from("weather", "flight_summary")
 
     val resultSet = session.execute(select)
 
