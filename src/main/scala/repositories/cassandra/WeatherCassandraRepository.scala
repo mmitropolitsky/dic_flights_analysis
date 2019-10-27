@@ -42,7 +42,8 @@ class WeatherCassandraRepository {
       apparentTemperatureMax float,
       windSpeed float,
       cloudCover float,
-      pressure float);""".stripMargin)
+      pressure float,
+      visibility float);""".stripMargin)
 
   def batchSaveFlatWeatherList(flatDailyWeatherList: List[FlatDailyWeather]): Unit = {
     if (session.isClosed) cluster.connect()
@@ -67,6 +68,7 @@ class WeatherCassandraRepository {
         .value("windSpeed", flatDailyWeather.windSpeed)
         .value("cloudCover", flatDailyWeather.cloudCover)
         .value("pressure", flatDailyWeather.pressure)
+        .value("visibility", flatDailyWeather.visibility)
 
       insertList = insert :: insertList
     }
@@ -98,7 +100,8 @@ class WeatherCassandraRepository {
       "apparentTemperatureMax",
       "windSpeed",
       "cloudCover",
-      "pressure").from("weather", "daily_data")
+      "pressure",
+      "visibility").from("weather", "daily_data")
 
     val resultSet = session.execute(select)
 

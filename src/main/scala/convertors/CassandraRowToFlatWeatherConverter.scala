@@ -23,7 +23,8 @@ object CassandraRowToFlatWeatherConverter {
       row.getFloat("apparentTemperatureMax"),
       row.getFloat("windSpeed"),
       row.getFloat("cloudCover"),
-      row.getFloat("pressure")
+      row.getFloat("pressure"),
+      row.getFloat("visibility")
     )
   }
 
