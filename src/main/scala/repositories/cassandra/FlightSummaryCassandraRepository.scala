@@ -10,22 +10,15 @@ class FlightSummaryCassandraRepository {
 
   session.execute("CREATE KEYSPACE IF NOT EXISTS weather WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };")
 
-  //  airportCode: String,
-  //  totalFlights: Integer,
-  //  totalLateFlights: Integer,
-  //  lateFlights: List[FlatFlight],
-  //  totalLateFlightsDueToRain: Integer,
-  //  totalLateFlightsDueToVisibility: Integer,
-  //  totalLateFlightsDueToWind: Integer
-
   session.execute(
     """CREATE TABLE IF NOT EXISTS
       weather.flight_summary (
-      "airportCode" text PRIMARY KEY,
+      "airportCode" text,
       "date" text,
       "totalFlights" int,
       "totalLateFlights" int,
-      "totalLateFlightsDueToWeather" int);""".stripMargin)
+      "totalLateFlightsDueToWeather" int,
+      PRIMARY KEY ("airportCode", "date"));""".stripMargin)
 
 
 }

@@ -1,0 +1,5 @@
+package convertors
+
+class CassandraRowToFlightSummaryConverter {
+
+}
