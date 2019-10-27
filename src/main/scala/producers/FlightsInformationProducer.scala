@@ -2,7 +2,7 @@ package producers
 
 import java.util.Properties
 
-import convertors.{ConverterUtils, FlightToFlatFlightConverter}
+import convertors.FlightToFlatFlightConverter
 import models.{FlatFlight, Flight}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 
@@ -19,10 +19,11 @@ object FlightsInformationProducer {
   val producer = new KafkaProducer[String, FlatFlight](props)
 
   def addFlightInformationToKafka(source: String, flight: Flight): Unit = {
+    val flatFlightInfo = FlightToFlatFlightConverter.convert(flight)
     //Keys are used to determine the partition within a log to which a message get's appended to
-    val data = new ProducerRecord[String, FlatFlight](topic, source, FlightToFlatFlightConverter.convert(flight))
+    val data = new ProducerRecord[String, FlatFlight](topic, flatFlightInfo.airportDateKey, flatFlightInfo)
     producer.send(data)
-//    producer.close()
+    //    producer.close()
     print(data + "\n")
   }
 }

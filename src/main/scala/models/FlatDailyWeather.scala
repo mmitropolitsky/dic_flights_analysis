@@ -18,5 +18,6 @@ case class FlatDailyWeather(
                              apparentTemperatureMax: Double,
                              windSpeed: Double,
                              cloudCover: Double,
-                             pressure: Double
+                             pressure: Double,
+                             visibility: Double
                            )

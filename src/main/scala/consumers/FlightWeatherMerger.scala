@@ -1,30 +1,38 @@
 package consumers
 
-import com.datastax.spark.connector._
-import org.apache.spark.sql.cassandra._
+import com.datastax.driver.core.Cluster
 import convertors.CassandraRowToFlatWeatherConverter
 import models.{FlatDailyWeather, FlatFlight}
 import org.apache.spark.SparkContext
 import org.apache.spark.streaming.dstream.DStream
+import repositories.cassandra.WeatherCassandraRepository
 
 object FlightWeatherMerger {
 
+  val cluster = Cluster.builder().withoutJMXReporting()
+    .addContactPoint("127.0.0.1").build()
+
+
   def joinFlightsWithWeatherDate(sc: SparkContext, flights: DStream[(String, FlatFlight)]): DStream[(String, (FlatFlight, FlatDailyWeather))] = {
-    val cassandraRowRdd = sc.cassandraTable("weather", "daily_data")
 
-    println(cassandraRowRdd.count)
+    val repo = new WeatherCassandraRepository
+    val resultSet = repo.selectAll()
 
-    val dailyWeatherRdd = cassandraRowRdd.map(row => {
-      val flatDailyWeather = CassandraRowToFlatWeatherConverter.convert(row)
+    var list = Seq[FlatDailyWeather]()
+    val it = resultSet.iterator()
+    while (it.hasNext) {
+      val r = it.next()
+      list = list :+ CassandraRowToFlatWeatherConverter.convert(r)
+    }
+
+    val cassandraRowRdd = sc.parallelize(list)
+
+    val dailyWeatherRdd = cassandraRowRdd.map(flatDailyWeather => {
       (flatDailyWeather.airportDateKey, flatDailyWeather)
     })
 
-
-    val transformedDStream = flights.transform(flightRdd => {
-      flightRdd.join(dailyWeatherRdd)
-    })
-
-    transformedDStream
+    flights.transform(_.join(dailyWeatherRdd))
   }
+
 
 }

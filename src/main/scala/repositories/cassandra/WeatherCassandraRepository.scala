@@ -1,7 +1,7 @@
 package repositories.cassandra
 
 import com.datastax.driver.core.querybuilder.{Insert, QueryBuilder}
-import com.datastax.driver.core.{BatchStatement, Cluster}
+import com.datastax.driver.core.{BatchStatement, Cluster, ResultSet}
 import convertors.ConverterUtils
 import models.FlatDailyWeather
 
@@ -27,7 +27,7 @@ class WeatherCassandraRepository {
   session.execute(
     """CREATE TABLE IF NOT EXISTS
       weather.daily_data (
-      airportDataKey text PRIMARY KEY,
+      airportDateKey text PRIMARY KEY,
       airportCode text,
       time timestamp,
       summary text,
@@ -51,7 +51,7 @@ class WeatherCassandraRepository {
 
     for (flatDailyWeather <- flatDailyWeatherList) {
       val insert = QueryBuilder.insertInto("weather", "daily_data")
-        .value("airportDataKey", flatDailyWeather.airportDateKey)
+        .value("airportDateKey", flatDailyWeather.airportDateKey)
         .value("airportCode", flatDailyWeather.airportCode)
         .value("time", ConverterUtils.convertLocalDateTimeToTimestamp(flatDailyWeather.time))
         .value("summary", flatDailyWeather.summary)
@@ -80,32 +80,32 @@ class WeatherCassandraRepository {
 
   }
 
-  def selectAll(): Unit = {
+  def selectAll(): ResultSet = {
     if (session.isClosed) cluster.connect()
-    try {
-      val select = QueryBuilder.select(
-        "airportCode",
-        "time",
-        "summary",
-        "icon",
-        "sunriseTime",
-        "sunsetTime",
-        "precipIntensityMax",
-        "precipProbability",
-        "temperatureMin",
-        "temperatureMax",
-        "apparentTemperatureMin",
-        "apparentTemperatureMax",
-        "windSpeed",
-        "cloudCover",
-        "pressure").from("weather", "daily_data")
+    val select = QueryBuilder.select(
+      "airportDateKey",
+      "airportCode",
+      "time",
+      "summary",
+      "icon",
+      "sunriseTime",
+      "sunsetTime",
+      "precipIntensityMax",
+      "precipProbability",
+      "temperatureMin",
+      "temperatureMax",
+      "apparentTemperatureMin",
+      "apparentTemperatureMax",
+      "windSpeed",
+      "cloudCover",
+      "pressure").from("weather", "daily_data")
 
-      val resultSet = session.execute(select)
+    val resultSet = session.execute(select)
 
 
-    } finally {
-      session.close()
-    }
+    session.close()
+
+    resultSet
 
   }
 
