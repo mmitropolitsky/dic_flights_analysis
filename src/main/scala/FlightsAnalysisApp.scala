@@ -18,11 +18,11 @@ object FlightsAnalysisApp extends App {
     //    val flights = LufthansaConnector.getStatusForFlightsWithSourceAndDestination(accessToken, source, destination)
 
 
-    var localTime1 = new ScheduledTime(LocalDateTime.parse("2019-10-28T10:00"))
-    var localArrival = new ScheduledTime(LocalDateTime.parse("2019-10-28T10:40"))
+    var localTime1 = new ScheduledTime(LocalDateTime.parse("2019-10-27T10:00"))
+    var localArrival = new ScheduledTime(LocalDateTime.parse("2019-10-27T10:40"))
     var status = new Status("TEST", "Testing ")
     var dep = new DepartureArrival("FRA", localTime1, localTime1, localArrival, localArrival, status)
-    var arr = new DepartureArrival("ARN", localTime1, localTime1, localArrival, localArrival, status)
+    var arr = new DepartureArrival("SOF", localTime1, localTime1, localArrival, localArrival, status)
     var carrierInfo = new CarrierInfo("LH", 1234)
     var flight = new Flight(dep, arr, carrierInfo)
     FlightsInformationProducer.addFlightInformationToKafka(destination, flight)

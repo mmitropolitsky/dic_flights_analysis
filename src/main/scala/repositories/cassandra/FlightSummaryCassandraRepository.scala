@@ -1,6 +1,9 @@
 package repositories.cassandra
 
 import com.datastax.driver.core.Cluster
+import com.datastax.driver.core.querybuilder.QueryBuilder
+import convertors.CassandraRowToFlightSummaryConverter
+import models.FlightSummary
 
 class FlightSummaryCassandraRepository {
 
@@ -21,4 +24,24 @@ class FlightSummaryCassandraRepository {
       PRIMARY KEY ("airportCode", "date"));""".stripMargin)
 
 
+  def selectAll(): List[FlightSummary] = {
+    if (session.isClosed) cluster.connect()
+    val select = QueryBuilder.select(
+      "airportCode",
+      "date",
+      "totalFlights",
+      "totalLateFlights",
+      "totalLateFlightsDueToWeather").from("weather", "flight_summary")
+
+    val resultSet = session.execute(select)
+
+    var list = List[FlightSummary]()
+    val it = resultSet.iterator()
+    while (it.hasNext) {
+      val r = it.next()
+      list = list :+ CassandraRowToFlightSummaryConverter.convert(r)
+    }
+
+    list
+  }
 }
