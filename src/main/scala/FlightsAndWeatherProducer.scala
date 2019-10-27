@@ -1,14 +1,10 @@
-
+import producers.FlightsInformationProducer
 
 import java.time.LocalDateTime
 
-import connectors.DarkSkyWeatherConnector
-import convertors.WeatherToFlatDailyWeatherConverter
 import models._
-import producers.FlightsInformationProducer
-import repositories.cassandra._
 
-object FlightsAnalysisApp extends App {
+object FlightsAndWeatherProducer extends App {
 
   val source = "SOF"
   val destination = "FRA"
@@ -29,17 +25,17 @@ object FlightsAnalysisApp extends App {
     requests += 1
     Thread.sleep(1000)
   }
-//  val darkSkyWeatherConnector = DarkSkyWeatherConnector
+  //  val darkSkyWeatherConnector = DarkSkyWeatherConnector
 
   //  Airport.airportCodeToCoordinatesMap.foreach {
   //    airport =>
-//  val w = darkSkyWeatherConnector.getWeatherForecastForAirport("ARN")
+  //  val w = darkSkyWeatherConnector.getWeatherForecastForAirport("ARN")
   //      Thread.sleep(1000)
   //  }
 
-//  val cassandra = new WeatherCassandraRepository
+  //  val cassandra = new WeatherCassandraRepository
   //  cassandra.selectAll()
-//  val flatDailyWeatherList = WeatherToFlatDailyWeatherConverter.convert(w)
-//  cassandra.batchSaveFlatWeatherList(flatDailyWeatherList)
+  //  val flatDailyWeatherList = WeatherToFlatDailyWeatherConverter.convert(w)
+  //  cassandra.batchSaveFlatWeatherList(flatDailyWeatherList)
 
 }

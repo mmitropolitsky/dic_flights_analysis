@@ -1,4 +1,4 @@
-package consumers.deserializer
+package consumers
 
 import java.io.{ByteArrayInputStream, ObjectInputStream}
 

@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   ("com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2").exclude("io.netty", "netty-handler"),
 //  "com.datastax.dse" % "dse-java-driver-query-builder" % "2.0.2",
   "com.lihaoyi" %% "requests" % "0.1.8",
-  "net.liftweb" %% "lift-json" % "3.3.0"
+  "net.liftweb" %% "lift-json" % "3.3.0",
+  "com.github.piotr-kalanski" % "splot" % "0.2.0"
 
 )
