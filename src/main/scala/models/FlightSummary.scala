@@ -1,11 +1,12 @@
 package models
 
 case class FlightSummary(
-                          airportCode: String,
-                          totalFlights: Integer,
-                          totalLateFlights: Integer,
+                          var airportCode: String,
+                          var date: String,
+                          var totalFlights: Integer,
+                          var totalLateFlights: Integer,
 //                          lateFlights: List[FlatFlight],
-                          totalLateFlightsDueToWeather: Integer)
+                          var totalLateFlightsDueToWeather: Integer)
 //                          totalLateFlightsDueToRain: Integer,
 //                          totalLateFlightsDueToVisibility: Integer,
 //                          totalLateFlightsDueToWind: Integer)

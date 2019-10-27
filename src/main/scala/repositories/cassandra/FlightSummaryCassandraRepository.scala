@@ -21,10 +21,11 @@ class FlightSummaryCassandraRepository {
   session.execute(
     """CREATE TABLE IF NOT EXISTS
       weather.flight_summary (
-      airportCode text PRIMARY KEY,
-      totalFlights int,
-      totalLateFlights int,
-      totalLateFlightsDueToWeather int);""".stripMargin)
+      "airportCode" text PRIMARY KEY,
+      "date" text,
+      "totalFlights" int,
+      "totalLateFlights" int,
+      "totalLateFlightsDueToWeather" int);""".stripMargin)
 
 
 }
